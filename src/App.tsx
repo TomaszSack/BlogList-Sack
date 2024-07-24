@@ -8,15 +8,47 @@ type Post = {
   body:string
 }
 
+type Address = {
+  street:string
+  suite:string
+  city:string
+  zipcode:string
+  geo:{
+    lat:string
+    lng:string
+  }
+}
+
+type Author = {
+  id:number
+  name:string
+  username:string
+  email:string
+  address:Address
+  phone:string
+  website:string
+  company:{
+    name:string
+    catchPhrase:string
+    bs:string
+  }
+}
+
 function App() {
   const [posts, setPosts] = useState([])
+  const [authors, setAuthors] = useState<Author[]>()
   const [value, setValue] = useState<string>()
 
   useEffect(()=>{
       fetch('https://jsonplaceholder.typicode.com/posts')
           .then(response => response.json())
           .then(json => setPosts(json))
+      fetch('https://jsonplaceholder.typicode.com/users')
+          .then(response => response.json())
+          .then(json => setAuthors(json))
   },[])
+
+  console.log(authors)
 
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value)
@@ -24,9 +56,11 @@ function App() {
 
   const handleSubmit = (e:React.SyntheticEvent) =>{
     e.preventDefault()
-    if (!value) return
+    if (!authors) return
+
+    const person = authors.filter((author) => author.name === value )
     
-    fetch(`https://jsonplaceholder.typicode.com/posts?userId=${value}`)
+    fetch(`https://jsonplaceholder.typicode.com/posts${value && `?userId=${person[0].id}`}`)
     .then(response => response.json())
     .then(json => setPosts(json))
   }
