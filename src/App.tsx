@@ -1,34 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
 
+type Post = {
+  userId:number
+  id: number
+  title:string
+  body:string
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [posts, setPosts] = useState([])
+  const [value, setValue] = useState<string>()
+
+  useEffect(()=>{
+      fetch('https://jsonplaceholder.typicode.com/posts')
+          .then(response => response.json())
+          .then(json => setPosts(json))
+  },[])
+
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+  }
+
+  const handleSubmit = (e:React.SyntheticEvent) =>{
+    e.preventDefault()
+    if (!value) return
+    
+    fetch(`https://jsonplaceholder.typicode.com/posts?userId=${value}`)
+    .then(response => response.json())
+    .then(json => setPosts(json))
+  }
 
   return (
-    <>
-      <div className='bg-red-300'>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input value={value} onChange={handleChange}></input>
+        <button type='submit'>Submit</button>
+      </form>
+      <div className='bg-[#fafafa] text-black'>
+      {
+        posts.map((post:Post)=>(
+          <p key={post.id}>{post.title}</p>
+        ))
+      }
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
