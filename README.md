@@ -1,1 +1,1 @@
-BlogList-Sack
+BlogList-Sack - aplication created as recruitment task to SoftKraft
