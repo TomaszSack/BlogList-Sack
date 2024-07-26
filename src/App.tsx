@@ -1,42 +1,13 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import BlogAsset from './assets/blogAsset.png'
+import { Author, Post } from './types'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 
-type Post = {
-  userId:number
-  id: number
-  title:string
-  body:string
-}
-
-type Address = {
-  street:string
-  suite:string
-  city:string
-  zipcode:string
-  geo:{
-    lat:string
-    lng:string
-  }
-}
-
-type Author = {
-  id:number
-  name:string
-  username:string
-  email:string
-  address:Address
-  phone:string
-  website:string
-  company:{
-    name:string
-    catchPhrase:string
-    bs:string
-  }
-}
 
 function App() {
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState<Post[]>()
   const [authors, setAuthors] = useState<Author[]>()
   const [value, setValue] = useState<string>()
 
@@ -66,29 +37,36 @@ function App() {
     .then(json => setPosts(json))
   }
 
-  if (!authors) return
+  if (!authors || !posts) return <div>Ooops... something went wrong</div>
 
   return (
     <div className='flex flex-col items-center p-6 bg-[#fafafa] text-[#121212]'>
-      <h1 className='text-5xl'>TOMASZ SACK <span className='text-[#f9423b]'>BLOG</span></h1>
-      <form onSubmit={handleSubmit}>
-        <input value={value} onChange={handleChange}></input>
-        <button type='submit'>Submit</button>
+      <div className='max-w-[1440px]'>
+      <h1 className='text-5xl text-center '>TOMASZ SACK <span className='text-[#f9423b]'>BLOG</span></h1>
+      <form className='text-center py-10' onSubmit={handleSubmit}>
+        <input className='text-xl border-2 border-[#f9423b] rounded-xl px-2' value={value} onChange={handleChange}></input>
+        <button className='relative left-[-28px]' type='submit'><FontAwesomeIcon className='text-[#f9423b]' size='lg' icon={faMagnifyingGlass} />  </button>
+        
       </form>
       <div className='flex flex-wrap justify-around'>
       {
         posts.map((post:Post)=>{
           const person = authors?.filter((author) => author.id===post.userId)
           return(
-          <div key={post.id} className='w-[350px] h-[400px] flex flex-col m-6 shadow-lg'>
+          <div key={post.id} className='w-[400px] h-[400px] flex flex-col m-6 shadow-lg'>
             <img src={BlogAsset} alt="" className='object-cover' />
             <div className='p-4'>
               <p><span className='text-[#f9423b]'>created by </span>{person[0].name}</p>
-              <h2 className='font-bold text-xl'>{post.title.charAt(0).toUpperCase()+post.title.slice(1)}</h2>
+              <h2 className='font-bold text-lg line-clamp-1 my-2'>{post.title.charAt(0).toUpperCase()+post.title.slice(1)}</h2>
+              <div className='text-sm line-clamp-3'>
+               {post.body.charAt(0).toUpperCase()+post.body.slice(1)}
+              </div>
+              <a className='text-sm text-[#f9423b]'>Read more<FontAwesomeIcon className='pl-1' icon={faArrowRight} /></a>
           </div>
           </div>
         )})
       }
+      </div>
       </div>
     </div>
   )
